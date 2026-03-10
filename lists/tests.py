@@ -9,7 +9,7 @@ class HomePageTest(TestCase):
         self.assertTemplateUsed(response, "home.html")
 
     def test_can_save_a_post_request(self):
-        response = self.client.post("/", data={"item_text": "A new list item"})
+        self.client.post("/", data={"item_text": "A new list item"})
 
         self.assertEqual(Item.objects.count(), 1)
         new_item = Item.objects.first()
