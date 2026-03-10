@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
-MAX_WAIT = 10
+MAX_WAIT = 5
 
 
 class NewVisitorTest(LiveServerTestCase):
@@ -27,7 +27,7 @@ class NewVisitorTest(LiveServerTestCase):
             except (AssertionError, WebDriverException) as e:
                 if time.time() - start_time > MAX_WAIT:
                     raise e
-                time.sleep(0.1)
+                time.sleep(0.5)
 
     def test_can_start_a_list_for_one_user(self):
         self.browser.get(self.live_server_url)
