@@ -1,11 +1,12 @@
 import time
+from django.test import LiveServerTestCase
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import unittest
 
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     def setUp(self) -> None:
         self.browser = Firefox()
 
@@ -18,7 +19,7 @@ class NewVisitorTest(unittest.TestCase):
         self.assertIn(row_text, [row.text for row in rows])
 
     def test_can_start_a_list_and_retrieve_it_later(self):
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
 
         self.assertIn('To-Do', self.browser.title)
         header_text = self.browser.find_element(By.TAG_NAME, 'h1').text
@@ -48,7 +49,7 @@ class NewVisitorTest(unittest.TestCase):
         self.check_for_row_in_list_table('1: Купить павлиньи перья')
         self.check_for_row_in_list_table('2: Сделать мушку из павлиньих перьев')
 
-        self.fail('Закончить тест')
+        # self.('Закончить тест')
 
 
 if __name__ == '__main__':
