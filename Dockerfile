@@ -1,12 +1,10 @@
-FROM python:3.14-slim
+FROM python:3.13-slim
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
-RUN python -m venv /venv
-ENV PATH="/venv/bin:$PATH"
-
-RUN pip install "django<6"
+RUN uv pip install --system "django<6" "gunicorn"
 
 COPY src /src
 
 WORKDIR /src
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8888"]
+CMD ["gunicorn", "--bind", ":8888", "superlists.wsgi:application"]
