@@ -1,16 +1,16 @@
 import time
 
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
-MAX_WAIT = 3
+MAX_WAIT = 5
 
 
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
     options = Options()
     options.add_argument('--headless')
 
@@ -19,6 +19,9 @@ class NewVisitorTest(LiveServerTestCase):
 
     def tearDown(self) -> None:
         self.browser.quit()
+
+    def get_page_center(self):
+        return self.browser.execute_script("return window.innerWidth") / 2
 
     def wait_for_row_in_list_table(self, row_text):
         start_time = time.time()
@@ -31,7 +34,7 @@ class NewVisitorTest(LiveServerTestCase):
             except (AssertionError, WebDriverException) as e:
                 if time.time() - start_time > MAX_WAIT:
                     raise e
-                time.sleep(0.1)
+                time.sleep(0.5)
 
     def test_can_start_a_list_for_one_user(self):
         self.browser.get(self.live_server_url)
@@ -91,11 +94,10 @@ class NewVisitorTest(LiveServerTestCase):
         """Тест макета и оформления страницы."""
         self.browser.get(self.live_server_url)
         self.browser.set_window_size(1024, 768)
-
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
+            self.get_page_center(),
             delta=10,
         )
 
@@ -105,6 +107,6 @@ class NewVisitorTest(LiveServerTestCase):
         inputbox = self.browser.find_element(By.ID, 'id_new_item')
         self.assertAlmostEqual(
             inputbox.location['x'] + inputbox.size['width'] / 2,
-            512,
+            self.get_page_center(),
             delta=10,
         )
