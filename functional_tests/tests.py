@@ -1,6 +1,8 @@
+import os
 import time
 
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
+from dotenv import load_dotenv
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -8,7 +10,7 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
 MAX_WAIT = 5
-
+load_dotenv()
 
 class NewVisitorTest(StaticLiveServerTestCase):
     options = Options()
@@ -16,6 +18,8 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
     def setUp(self) -> None:
         self.browser = Firefox(options=self.options)
+        if test_server := os.environ.get('TEST_SERVER'):
+            self.live_server_url = f'http://{test_server}'
 
     def tearDown(self) -> None:
         self.browser.quit()
