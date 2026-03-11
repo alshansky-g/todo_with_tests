@@ -4,14 +4,18 @@ from django.test import LiveServerTestCase
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
-MAX_WAIT = 5
+MAX_WAIT = 3
 
 
 class NewVisitorTest(LiveServerTestCase):
+    options = Options()
+    options.add_argument('--headless')
+
     def setUp(self) -> None:
-        self.browser = Firefox()
+        self.browser = Firefox(options=self.options)
 
     def tearDown(self) -> None:
         self.browser.quit()
@@ -27,7 +31,7 @@ class NewVisitorTest(LiveServerTestCase):
             except (AssertionError, WebDriverException) as e:
                 if time.time() - start_time > MAX_WAIT:
                     raise e
-                time.sleep(0.5)
+                time.sleep(0.1)
 
     def test_can_start_a_list_for_one_user(self):
         self.browser.get(self.live_server_url)
@@ -63,7 +67,7 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertRegex(edith_list_url, '/lists/.+')
 
         self.browser.quit()
-        self.browser = Firefox()
+        self.browser = Firefox(options=self.options)
 
         self.browser.get(self.live_server_url)
         page_text = self.browser.find_element(By.TAG_NAME, 'body').text
