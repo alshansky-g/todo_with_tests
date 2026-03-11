@@ -132,8 +132,8 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "lxml", extras = ["cssselect"], specifier = ">=6.0.2" },
-    { name = "selenium", specifier = ">=4.41.0" },
+    { name = "lxml", extras = ["cssselect"], specifier = "==6.0.2" },
+    { name = "selenium", specifier = "==4.41.0" },
 ]
 
 [[package]]
