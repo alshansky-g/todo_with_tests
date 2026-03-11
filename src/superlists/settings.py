@@ -20,15 +20,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-enut040#%r24ev&h03sddr2!(e-h4eh_5z%na$_+liv37j(=n0'
-DEBUG = True
-ALLOWED_HOSTS = []
-
 # SECURITY WARNING: don't run with debug turned on in production!
 if 'DJANGO_DEBUG_FALSE' in os.environ:
     DEBUG = False
     SECRET_KEY = os.environ['DJANGO_SECRET_KEY']
     ALLOWED_HOSTS = [os.environ['DJANGO_ALLOWED_HOST']]
+    db_path = os.environ['DJANGO_DB_PATH']
+else:
+    DEBUG = True
+    SECRET_KEY = 'django-insecure-enut040#%r24ev&h03sddr2!(e-h4eh_5z%na$_+liv37j(=n0'
+    ALLOWED_HOSTS = []
+    db_path = BASE_DIR / 'db.sqlite3'
 
 
 # Application definition
@@ -80,7 +82,7 @@ WSGI_APPLICATION = 'superlists.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': db_path,
     }
 }
 

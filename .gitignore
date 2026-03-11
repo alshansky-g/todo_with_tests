@@ -13,3 +13,4 @@ geckodriver.log
 /static
 .env
 src/static
+container.db.sqlite3
