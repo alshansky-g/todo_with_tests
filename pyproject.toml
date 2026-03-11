@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "django>=4",
+    "lxml[cssselect]>=6.0.2",
     "selenium>=4",
 ]
 [tool.ruff]

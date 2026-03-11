@@ -1,3 +1,4 @@
+import lxml.html
 from django.test import TestCase
 from lists.models import Item, List
 
@@ -7,6 +8,13 @@ class HomePageTest(TestCase):
         response = self.client.get('/')
 
         self.assertTemplateUsed(response, 'home.html')
+
+    def test_renders_input_form(self):
+        response = self.client.get('/')
+        parsed = lxml.html.fromstring(response.content)
+        [form] = parsed.cssselect('form[method=POST]')
+        self.assertEqual(form.get('action'), '/lists/new')
+        [input] = form.cssselect('input[name=item_text]')
 
 
 class ListAndItemModelsTest(TestCase):
@@ -44,8 +52,14 @@ class ListViewTest(TestCase):
         response = self.client.get(f'/lists/{list_.id}')
         self.assertTemplateUsed(response, 'list.html')
 
-    def renders_input_form(self):
-        pass
+    def test_renders_input_form(self):
+        mylist = List.objects.create()
+        response = self.client.get(f"/lists/{mylist.id}")
+        parsed = lxml.html.fromstring(response.content)
+        [form] = parsed.cssselect("form[method=POST]")
+        self.assertEqual(form.get("action"), f"/lists/{mylist.id}/add_item")
+        inputs = form.cssselect("input")
+        self.assertIn('item_text', [input.get('name') for input in inputs])
 
     def test_displays_only_items_for_that_list(self):
         correct_list = List.objects.create()
