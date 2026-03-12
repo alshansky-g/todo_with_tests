@@ -17,35 +17,6 @@ class HomePageTest(TestCase):
         [input] = form.cssselect('input[name=item_text]')
 
 
-class ListAndItemModelsTest(TestCase):
-    def test_saving_and_retrieving_items(self):
-        list_ = List()
-        list_.save()
-
-        first_item = Item()
-        first_item.text = 'The first (ever) list item'
-        first_item.list = list_
-        first_item.save()
-
-        second_item = Item()
-        second_item.text = 'Item the second'
-        second_item.list = list_
-        second_item.save()
-
-        saved_list = List.objects.first()
-        self.assertEqual(saved_list, list_)
-
-        saved_items = Item.objects.all()
-        self.assertEqual(saved_items.count(), 2)
-
-        first_saved_item = saved_items[0]
-        second_saved_item = saved_items[1]
-        self.assertEqual(first_saved_item.text, 'The first (ever) list item')
-        self.assertEqual(first_saved_item.list, list_)
-        self.assertEqual(second_saved_item.text, 'Item the second')
-        self.assertEqual(second_saved_item.list, list_)
-
-
 class ListViewTest(TestCase):
     def test_uses_list_template(self):
         list_ = List.objects.create()
@@ -54,11 +25,11 @@ class ListViewTest(TestCase):
 
     def test_renders_input_form(self):
         mylist = List.objects.create()
-        response = self.client.get(f"/lists/{mylist.id}")
+        response = self.client.get(f'/lists/{mylist.id}')
         parsed = lxml.html.fromstring(response.content)
-        [form] = parsed.cssselect("form[method=POST]")
-        self.assertEqual(form.get("action"), f"/lists/{mylist.id}/add_item")
-        inputs = form.cssselect("input")
+        [form] = parsed.cssselect('form[method=POST]')
+        self.assertEqual(form.get('action'), f'/lists/{mylist.id}/add_item')
+        inputs = form.cssselect('input')
         self.assertIn('item_text', [input.get('name') for input in inputs])
 
     def test_displays_only_items_for_that_list(self):
