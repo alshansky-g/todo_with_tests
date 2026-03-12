@@ -1,45 +1,11 @@
-import os
-import time
-
-from django.contrib.staticfiles.testing import StaticLiveServerTestCase
-from dotenv import load_dotenv
-from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
-MAX_WAIT = 5
-load_dotenv()
+from functional_tests.base import FunctionalTest
 
-class NewVisitorTest(StaticLiveServerTestCase):
-    options = Options()
-    options.add_argument('--headless')
 
-    def setUp(self) -> None:
-        self.browser = Firefox(options=self.options)
-        if test_server := os.environ.get('TEST_SERVER'):
-            self.live_server_url = f'http://{test_server}'
-
-    def tearDown(self) -> None:
-        self.browser.quit()
-
-    def get_page_center(self):
-        return self.browser.execute_script("return window.innerWidth") / 2
-
-    def wait_for_row_in_list_table(self, row_text):
-        start_time = time.time()
-        while True:
-            try:
-                table = self.browser.find_element(By.ID, 'id_list_table')
-                rows = table.find_elements(By.TAG_NAME, 'tr')
-                self.assertIn(row_text, [row.text for row in rows])
-                return
-            except (AssertionError, WebDriverException) as e:
-                if time.time() - start_time > MAX_WAIT:
-                    raise e
-                time.sleep(0.5)
-
+class NewVisitorTest(FunctionalTest):
     def test_can_start_a_list_for_one_user(self):
         self.browser.get(self.live_server_url)
 
@@ -93,24 +59,3 @@ class NewVisitorTest(StaticLiveServerTestCase):
         page_text = self.browser.find_element(By.TAG_NAME, 'body').text
         self.assertNotIn('Купить павлиньи перья', page_text)
         self.assertIn('Купить молоко', page_text)
-
-    def test_layout_and_styling(self):
-        """Тест макета и оформления страницы."""
-        self.browser.get(self.live_server_url)
-        self.browser.set_window_size(1024, 768)
-        inputbox = self.browser.find_element(By.ID, 'id_new_item')
-        self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            self.get_page_center(),
-            delta=10,
-        )
-
-        inputbox.send_keys('testing')
-        inputbox.send_keys(Keys.ENTER)
-        self.wait_for_row_in_list_table('1: testing')
-        inputbox = self.browser.find_element(By.ID, 'id_new_item')
-        self.assertAlmostEqual(
-            inputbox.location['x'] + inputbox.size['width'] / 2,
-            self.get_page_center(),
-            delta=10,
-        )
