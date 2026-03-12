@@ -5,6 +5,5 @@ services:
       - "8888:8888"
     volumes:
       - $PWD/container.db.sqlite3:/home/user/container.db.sqlite3
-    env_file:
-      - .env
+    image: superlists
     stop_grace_period: 2s

@@ -1,31 +1,100 @@
 - hosts: all
 
   tasks:
+    - name: Install docker
+      ansible.builtin.apt:
+        name: docker.io
+        state: latest
+        update_cache: true
+      become: true
 
-  - name: Install docker
-    ansible.builtin.apt:
-      name: docker.io
-      state: latest
-      update_cache: true
-    become: true
+    - name: Add our user to the docker group, so we don't need sudo/become
+      ansible.builtin.user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: true
+      become: true
+
+    - name: Reset ssh connection to allow the user/group change to take effect
+      ansible.builtin.meta: reset_connection
+
+    - name: Run test container
+      community.docker.docker_container:
+        name: testcontainer
+        state: started
+        image: busybox
+        command: echo hello world
+      become: true
+
+    - name: Build container image locally
+      community.docker.docker_image:
+        name: superlists
+        source: build
+        state: present
+        build:
+          path: ..
+          platform: linux/amd64
+        force_source: true
+      delegate_to: 127.0.0.1
+
+    - name: Export container image locally
+      community.docker.docker_image:
+        name: superlists
+        archive_path: /tmp/superlists-img.tar
+        source: local
+      delegate_to: 127.0.0.1
+
+    - name: Upload image to server
+      ansible.builtin.copy:
+        src: /tmp/superlists-img.tar
+        dest: /tmp/superlists-img.tar
+
+    - name: Import container image on server
+      community.docker.docker_image:
+        name: superlists
+        load_path: /tmp/superlists-img.tar
+        source: load
+        force_source: true
+        state: present
+
+    - name: Ensure .secret-key file exists
+      ansible.builtin.copy:
+        dest: ~/.secret-key
+        content: "{{ lookup('password', '/dev/null length=32 chars=ascii_letters') }}"
+        mode: 0600
+        force: false
+
+    - name: Read secret key back from file
+      ansible.builtin.slurp:
+        src: ~/.secret-key
+      register: secret_key
+
+    - name: Ensure db.sqlite3 file exists outside container
+      ansible.builtin.file:
+        path: "{{ ansible_env.HOME }}/db.sqlite3"
+        state: touch
+        owner: 1234
+      become: true
+
+    - name: Run container
+      community.docker.docker_container:
+        name: superlists
+        image: superlists
+        state: started
+        recreate: true
+        env:
+          DJANGO_DEBUG_FALSE: "1"
+          DJANGO_SECRET_KEY: "{{ secret_key.content | b64decode }}"
+          DJANGO_ALLOWED_HOST: "{{ inventory_hostname }}"
+          DJANGO_DB_PATH: "/home/user/db.sqlite3"
+        mounts:
+          - type: bind
+            source: "{{ ansible_env.HOME }}/db.sqlite3"
+            target: /home/user/db.sqlite3
+        ports: 80:8888
 
 
-  - name: Add our user to the docker group, so we don't need sudo/become
-    ansible.builtin.user:
-      name: '{{ ansible_user }}'
-      groups: docker
-      append: true
-    become: true
-
-
-  - name: Reset ssh connection to allow the user/group change to take effect
-    ansible.builtin.meta: reset_connection
-
-
-  - name: Run test container
-    community.docker.docker_container:
-      name: testcontainer
-      state: started
-      image: busybox
-      command: echo hello world
-    become: true
+    - name: Run migration inside container
+      community.docker.docker_container_exec:
+        container: superlists
+        command: ./manage.py migrate
