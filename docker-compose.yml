@@ -5,5 +5,10 @@ services:
       - "8888:8888"
     volumes:
       - $PWD/container.db.sqlite3:/home/user/container.db.sqlite3
+    environment:
+      DJANGO_DEBUG_FALSE: "1"
+      DJANGO_SECRET_KEY: "localdevsecret"
+      DJANGO_ALLOWED_HOST: "localhost"
+      DJANGO_DB_PATH: /home/user/container.db.sqlite3
     image: superlists
     stop_grace_period: 2s

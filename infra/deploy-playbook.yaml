@@ -93,7 +93,6 @@
             target: /home/user/db.sqlite3
         ports: 80:8888
 
-
     - name: Run migration inside container
       community.docker.docker_container_exec:
         container: superlists
