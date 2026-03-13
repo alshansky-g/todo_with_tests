@@ -7,33 +7,27 @@ from lists.models import Item, List
 
 
 def home_page(request: HttpRequest):
-    # return render(request, 'home.html', {'form': ItemForm()})
-    return render(request, 'home.html')
+    return render(request, 'home.html', {'form': ItemForm()})
+    # return render(request, 'home.html')
 
 
 def view_list(request: HttpRequest, list_id: int):
     our_list = List.objects.get(id=list_id)
-    error = None
+    form = ItemForm()
 
     if request.method == 'POST':
-        try:
-            item = Item(list=our_list, text=request.POST['item_text'])
-            item.full_clean()
-            item.save()
+        form = ItemForm(data=request.POST)
+        if form.is_valid():
+            Item.objects.create(text=request.POST['text'], list=our_list)
             return redirect(our_list)
-        except ValidationError:
-            error = "You can't have an empty list item"
-    return render(request, 'list.html', {'list': our_list, 'error': error})
+    return render(request, 'list.html', {'list': our_list, 'form': form})
 
 
 def new_list(request: HttpRequest):
-    list_ = List.objects.create()
-    item = Item(text=request.POST.get('item_text'), list=list_)
-    try:
-        item.full_clean()
-        item.save()
-    except ValidationError:
-        list_.delete()
-        error = "You can't have an empty list item"
-        return render(request, 'home.html', {'error': error})
-    return redirect(list_)
+    form = ItemForm(data=request.POST)
+    if form.is_valid():
+        nulist = List.objects.create()
+        Item.objects.create(text=request.POST['text'], list=nulist)
+        return redirect(nulist)
+    else:
+        return render(request, 'home.html', {'form': form})

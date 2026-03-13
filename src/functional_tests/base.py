@@ -25,6 +25,9 @@ class FunctionalTest(StaticLiveServerTestCase):
     def tearDown(self) -> None:
         self.browser.quit()
 
+    def get_item_input_box(self):
+        return self.browser.find_element(By.ID, 'id_text')
+
     def get_page_center(self):
         return self.browser.execute_script('return window.innerWidth') / 2
 
