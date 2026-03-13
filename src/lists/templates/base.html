@@ -21,6 +21,9 @@
               placeholder="Enter a to-do item"
             />
             {% csrf_token %}
+            {% if error %}
+              <div class="invalid-feedback d-block">{{ error }}</div>
+            {% endif %}
           </form>
         </div>
       </div>

@@ -24,11 +24,11 @@ class ItemValidationTest(FunctionalTest):
 
         self.wait_for(
             lambda: self.assertEqual(
-                self.browser.find_element(By.CSS_SELECTOR, '.invalid_feedback').text,
+                self.browser.find_element(By.CSS_SELECTOR, '.invalid-feedback').text,
                 "You can't have an empty list item",
             )
         )
 
         self.browser.find_element(By.ID, 'id_new_item').send_keys('Налить чаю')
-        self.browser.find_element(By.ID, 'id_new_item').send_keys(Keys.Enter)
+        self.browser.find_element(By.ID, 'id_new_item').send_keys(Keys.ENTER)
         self.wait_for_row_in_list_table('2: Налить чаю')
