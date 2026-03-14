@@ -40,6 +40,6 @@ class ItemValidationTest(FunctionalTest):
         self.wait_for(
             lambda: self.assertEqual(
                 self.browser.find_element(By.CSS_SELECTOR, '.invalid-feedback').text,
-                'Эта запись уже была добавлена ранее',
+                "You've already got this in your list",
             )
         )
