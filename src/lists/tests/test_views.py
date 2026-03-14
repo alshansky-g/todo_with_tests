@@ -2,7 +2,7 @@ from unittest import skip
 from django.utils import html
 import lxml.html
 from django.test import TestCase
-from lists.forms import EMPTY_ITEM_ERROR
+from lists.forms import DUPLICATE_ITEM_ERROR, EMPTY_ITEM_ERROR
 from lists.models import Item, List
 
 
@@ -128,7 +128,12 @@ class NewListTest(TestCase):
         response = self.post_invalid_input()
         self.assertContains(response, html.escape(EMPTY_ITEM_ERROR))
 
-    @skip
+    def test_for_invalid_input_sets_is_invalid_class(self):
+        response = self.post_invalid_input()
+        parsed = lxml.html.fromstring(response.content)
+        [input] = parsed.cssselect('input[name=text]')
+        self.assertIn('is-invalid', set(input.classes))
+
     def test_duplicate_item_validation_errors_end_up_on_lists_page(self):
         list1 = List.objects.create()
         Item.objects.create(list=list1, text='textey')

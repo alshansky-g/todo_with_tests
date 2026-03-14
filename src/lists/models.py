@@ -13,3 +13,7 @@ class Item(models.Model):
 
     class Meta:
         unique_together = ('list', 'text')
+        ordering = ('id',)
+
+    def __str__(self):
+        return self.text
