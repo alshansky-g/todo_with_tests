@@ -3,5 +3,6 @@ const initialize = (inputSelector, errorSelector) => {
   textInput.oninput = () => {
     const errorMsg = document.querySelector(errorSelector);
     errorMsg.style.display = "none";
+    textInput.classList.remove("is-invalid");
   };
 };

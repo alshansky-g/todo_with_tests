@@ -46,4 +46,10 @@ describe("Superlists JavaScript", () => {
   initialize(inputSelector, errorSelector);
   expect(errorMsg.checkVisibility()).toBe(true);
 });
+
+  it("should remove is-invalid class on input", () => {
+    initialize(inputSelector, errorSelector);
+    textInput.dispatchEvent(new InputEvent("input"));
+    expect(textInput.classList.contains("is-invalid")).toBe(false);
+  });
 })
