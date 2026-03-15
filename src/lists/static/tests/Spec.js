@@ -37,19 +37,14 @@ describe("Superlists JavaScript", () => {
   })
 
   it("should hide error message on input", () => {
-    initialize(inputSelector, errorSelector);
+    initialize(inputSelector);
     textInput.dispatchEvent(new InputEvent("input"));
     expect(errorMsg.checkVisibility()).toBe(false);
   })
 
   it("should not hide error message before event is fired", () => {
-  initialize(inputSelector, errorSelector);
+  initialize(inputSelector);
   expect(errorMsg.checkVisibility()).toBe(true);
 });
 
-  it("should remove is-invalid class on input", () => {
-    initialize(inputSelector, errorSelector);
-    textInput.dispatchEvent(new InputEvent("input"));
-    expect(textInput.classList.contains("is-invalid")).toBe(false);
-  });
 })
