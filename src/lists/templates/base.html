@@ -9,27 +9,59 @@
 
   <body>
     <div class="container">
+      <nav class="navbar">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="/">Superlists</a>
+          {% if user.email %}
+            <span class="navbar-text">Logged in as {{ user.email }}</span>
+            <form action="TODO" method="POST">
+              {% csrf_token %}
+              <button id="id_logout" class="btn btn-outline-secondary" type="submit">Log out</button>
+            </form>
+            {% else %}
+            <form action="{% url "send_login_email" %}" method="POST">
+              <div class="input-group">
+                <label for="id_email_input" class="navbar-text me-2">Enter your email to log in</label>
+                <input name="email" class="form-control" placeholder="[email protected]" id="id_email_input">
+                {% csrf_token %}
+              </div>
+            </form>
+            {% endif %}
+          
+        </div>
+      </nav>
+    {% if messages %}
+    <div class="row">
+      <div class="col-md-12">
+        {% for message in messages %}
+          {% if message.level_tag == 'success' %}
+            <div class="alert alert-success">{{ message }}</div>
+          {% else %}
+            <div class="alert alert-warning">{{ message }}</div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
       <div class="row justify-content-center p-5 bg-body-tertiary rounded-3">
         <div class="col-lg-6 text-center">
           <h1 class="display-1 mb-4">{% block header_text %}{% endblock %}</h1>
 
-          <form method="POST" action="{% block form_action %}{% endblock %}" >
+          <form method="POST" action="{% block form_action %}{% endblock %}">
             {% csrf_token %}
             <input
               id="id_text"
               name="text"
-              class="form-control
-                    form-control-lg
-                    {% if form.errors %}is-invalid{% endif %}"
+              class="form-control form-control-lg {% if form.errors %}is-invalid{% endif %}"
               placeholder="Enter a to-do item"
               value="{{ form.text.value | default:'' }}"
               aria-describedby="id_text_feedback"
               required
             />
             {% if form.errors %}
-              <div id="id_text_feedback" class="invalid-feedback">
-                {{ form.errors.text.0 }}
-              </div>
+            <div id="id_text_feedback" class="invalid-feedback">
+              {{ form.errors.text.0 }}
+            </div>
             {% endif %}
           </form>
         </div>
@@ -43,7 +75,7 @@
     <script>
       window.onload = () => {
         initialize("#id_text");
-      }
+      };
     </script>
   </body>
 </html>

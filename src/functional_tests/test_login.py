@@ -34,7 +34,7 @@ class LoginTest(FunctionalTest):
 
         url = url_search.group(0)
         self.assertIn(self.live_server_url, url)
-        
+
         self.browser.get(url)
 
         self.wait_for(
