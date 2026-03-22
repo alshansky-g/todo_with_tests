@@ -33,3 +33,8 @@ def login(request: HttpRequest):
     else:
         messages.error(request, 'Invalid login link, please request a new one')
     return redirect('/')
+
+
+def logout(request: HttpRequest):
+    auth.logout(request)
+    return redirect('/')
