@@ -1,3 +1,4 @@
+from functools import wraps
 import os
 import time
 from typing import Callable
@@ -11,6 +12,21 @@ from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
 MAX_WAIT = 5
 load_dotenv()
+
+
+def wait(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        while True:
+            try:
+                return func(*args, **kwargs)
+            except (AssertionError, WebDriverException):
+                if time.time() - start_time > MAX_WAIT:
+                    raise
+                time.sleep(0.5)
+
+    return wrapper
 
 
 class FunctionalTest(StaticLiveServerTestCase):
@@ -31,6 +47,7 @@ class FunctionalTest(StaticLiveServerTestCase):
     def get_page_center(self):
         return self.browser.execute_script('return window.innerWidth') / 2
 
+    @wait
     def wait_for_row_in_list_table(self, row_text):
         start_time = time.time()
         while True:
@@ -44,26 +61,16 @@ class FunctionalTest(StaticLiveServerTestCase):
                     raise
                 time.sleep(0.5)
 
+    @wait
     def wait_for(self, func: Callable):
-        start_time = time.time()
-        while True:
-            try:
-                return func()
-            except (AssertionError, WebDriverException):
-                if time.time() - start_time > MAX_WAIT:
-                    raise
-                time.sleep(0.5)
+        return func()
 
+    @wait
     def wait_to_be_logged_in(self, email: str):
-        self.wait_for(
-            lambda: self.browser.find_element(By.CSS_SELECTOR, '#id_logout'),
-        )
         navbar = self.browser.find_element(By.CSS_SELECTOR, '.navbar')
         self.assertIn(email, navbar.text)
 
+    @wait
     def wait_to_be_logged_out(self, email: str):
-        self.wait_for(
-            lambda: self.browser.find_element(By.CSS_SELECTOR, 'input[name=email]'),
-        )
         navbar = self.browser.find_element(By.CSS_SELECTOR, '.navbar')
         self.assertNotIn(email, navbar.text)
