@@ -1,6 +1,7 @@
 from django.http import HttpRequest
 from django.shortcuts import redirect, render
 
+from accounts.models import User
 from lists.forms import ExistingListItemForm, ItemForm
 from lists.models import List
 
@@ -25,6 +26,8 @@ def new_list(request: HttpRequest):
     form = ItemForm(data=request.POST)
     if form.is_valid():
         nulist = List.objects.create()
+        nulist.owner = request.user
+        nulist.save()
         form.save(for_list=nulist)
         return redirect(nulist)
     else:
@@ -32,4 +35,5 @@ def new_list(request: HttpRequest):
 
 
 def my_lists(request: HttpRequest, email: str):
-    return render(request, 'my_lists.html')
+    owner = User.objects.get(email=email)
+    return render(request, 'my_lists.html', {'owner': owner})

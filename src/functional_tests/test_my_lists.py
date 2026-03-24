@@ -28,13 +28,6 @@ class MyListsTest(FunctionalTest):
         )
 
     def test_logged_in_users_lists_are_saved_as_my_lists(self):
-        # email = '[email protected]'
-        # self.browser.get(self.live_server_url)
-        # self.wait_to_be_logged_out(email)
-
-        # self.create_pre_authenticated_session(email)
-        # self.browser.get(self.live_server_url)
-        # self.wait_to_be_logged_in(email)
         self.create_pre_authenticated_session('[email protected]')
 
         self.browser.get(self.live_server_url)
@@ -51,9 +44,6 @@ class MyListsTest(FunctionalTest):
             )
         )
 
-        self.wait_for(
-            lambda: self.browser.find_element(By.LINK_TEXT, 'Reticulate splines')
-        )
         self.browser.find_element(By.LINK_TEXT, 'Reticulate splines').click()
         self.wait_for(
             lambda: self.assertEqual(self.browser.current_url, first_list_url)
