@@ -20,12 +20,10 @@ jobs:
       - name: Install dependencies
         run: |
           python --version ; pip --version
-          pip install .
+          pip install --group dev .
 
       - name: Run unit tests
         run: python src/manage.py test lists accounts
 
       - name: Run all tests
-        run: |
-          pip install --group dev .
-          cd src && python manage.py test
+        run: cd src && python manage.py test
