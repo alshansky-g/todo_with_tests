@@ -7,6 +7,10 @@ class List(models.Model):
         'accounts.User', related_name='lists', blank=True, null=True, on_delete=models.CASCADE
     )
 
+    @property
+    def name(self):
+        return self.item_set.first().text
+
     def get_absolute_url(self):
         return reverse('view_list', args=[self.id])
 
