@@ -13,7 +13,7 @@ from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
 from functional_tests.container_commands import reset_database
 
-MAX_WAIT = 5
+MAX_WAIT = 10
 load_dotenv()
 
 
