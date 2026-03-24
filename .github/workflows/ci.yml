@@ -5,22 +5,19 @@ on: [push]
 jobs:
   test-python:
     runs-on: ubuntu-latest
-    container:
-      image: python:slim
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Cache pip
-        uses: actions/cache@v4
+      - uses: actions/setup-python@v5
         with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          python-version: '3.13'
+          cache: 'pip'
+
+      - uses: browser-actions/setup-firefox@v1
 
       - name: Install dependencies
-        run: |
-          python --version ; pip --version
-          pip install --group dev .
+        run: pip install --group dev .
 
       - name: Run unit tests
         run: python src/manage.py test lists accounts
