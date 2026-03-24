@@ -1,6 +1,7 @@
 from django.db import IntegrityError
 from django.forms import ValidationError
 from django.test import TestCase
+from accounts.models import User
 from lists.models import Item, List
 
 
@@ -50,7 +51,7 @@ class ItemModelsTest(TestCase):
         self.assertEqual(str(item), 'some text')
 
 
-class ListModelsTest(TestCase):
+class ListModelTest(TestCase):
     def test_get_absolute_url(self):
         mylist = List.objects.create()
         self.assertEqual(mylist.get_absolute_url(), f'/lists/{mylist.id}')
@@ -64,3 +65,11 @@ class ListModelsTest(TestCase):
             list(list1.item_set.all()),
             [item1, item2, item3]
         )
+
+    def test_lists_can_have_owners(self):
+        user = User.objects.create(email='a@b.com')
+        mylist = List.objects.create(owner=user)
+        self.assertIn(mylist, user.lists.all())
+
+    def test_list_owner_is_optional(self):
+        List.objects.create()
