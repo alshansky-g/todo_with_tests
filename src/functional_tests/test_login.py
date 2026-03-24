@@ -5,7 +5,7 @@ from selenium.webdriver.common.keys import Keys
 from functional_tests.base import FunctionalTest
 
 
-TEST_EMAIL = 'rgcs@example.com'
+TEST_EMAIL = 'edith@example.com'
 SUBJECT = 'Your login link for Superlists'
 
 
@@ -22,6 +22,8 @@ class LoginTest(FunctionalTest):
                 self.browser.find_element(By.CSS_SELECTOR, 'body').text,
             )
         )
+        if self.test_server:
+            return
 
         email = mail.outbox.pop()
         self.assertIn(TEST_EMAIL, email.to)

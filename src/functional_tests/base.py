@@ -10,6 +10,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
+from functional_tests.container_commands import reset_database
+
 MAX_WAIT = 5
 load_dotenv()
 
@@ -35,8 +37,10 @@ class FunctionalTest(StaticLiveServerTestCase):
 
     def setUp(self) -> None:
         self.browser = Firefox(options=self.options)
-        if test_server := os.environ.get('TEST_SERVER'):
-            self.live_server_url = f'http://{test_server}'
+        self.test_server = os.environ.get('TEST_SERVER')
+        if self.test_server:
+            self.live_server_url = f'http://{self.test_server}'
+            reset_database(self.test_server)
 
     def tearDown(self) -> None:
         self.browser.quit()

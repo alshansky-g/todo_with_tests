@@ -13,4 +13,5 @@ services:
       DJANGO_ALLOWED_HOST: "localhost"
       DJANGO_DB_PATH: /home/user/container.db.sqlite3
     image: superlists
+    container_name: superlists
     stop_grace_period: 2s
