@@ -1,4 +1,3 @@
-from unittest import skip
 from django.utils import html
 import lxml.html
 from django.test import TestCase
@@ -149,3 +148,9 @@ class NewListTest(TestCase):
         self.assertContains(response, expected_error)
         self.assertTemplateUsed(response, 'list.html')
         self.assertEqual(Item.objects.all().count(), 1)
+
+
+class MyListTest(TestCase):
+    def test_my_lists_url_renders_my_lists_template(self):
+        response = self.client.get('/lists/users/[email protected]')
+        self.assertTemplateUsed(response, 'my_lists.html')

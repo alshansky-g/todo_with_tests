@@ -1,14 +1,12 @@
-from django.forms import ValidationError
 from django.http import HttpRequest
 from django.shortcuts import redirect, render
 
 from lists.forms import ExistingListItemForm, ItemForm
-from lists.models import Item, List
+from lists.models import List
 
 
 def home_page(request: HttpRequest):
     return render(request, 'home.html', {'form': ItemForm()})
-    # return render(request, 'home.html')
 
 
 def view_list(request: HttpRequest, list_id: int):
@@ -31,3 +29,7 @@ def new_list(request: HttpRequest):
         return redirect(nulist)
     else:
         return render(request, 'home.html', {'form': form})
+
+
+def my_lists(request: HttpRequest, email: str):
+    return render(request, 'my_lists.html')
