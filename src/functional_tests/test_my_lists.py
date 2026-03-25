@@ -43,7 +43,7 @@ class MyListsTest(FunctionalTest):
                 self.browser.find_element(By.CSS_SELECTOR, 'h1').text,
             )
         )
-
+        self.fail()
         self.browser.find_element(By.LINK_TEXT, 'Reticulate splines').click()
         self.wait_for(
             lambda: self.assertEqual(self.browser.current_url, first_list_url)
