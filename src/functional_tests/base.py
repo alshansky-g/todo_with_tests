@@ -1,10 +1,11 @@
+import os
+import time
+from collections.abc import Callable
 from datetime import UTC, datetime
 from functools import wraps
-import os
 from pathlib import Path
-import time
-from typing import Callable
 
+from django.conf import settings
 from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from dotenv import load_dotenv
 from selenium.common.exceptions import WebDriverException
@@ -13,7 +14,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
-from functional_tests.container_commands import reset_database
+from functional_tests.container_commands import create_session_on_server, reset_database
+from functional_tests.management.commands.create_session import create_pre_authenticated_session
 
 MAX_WAIT = 10
 SCREEN_DUMP_LOCATION = Path(__file__).absolute().parent / 'screendumps'
@@ -36,11 +38,8 @@ def wait(func):
 
 
 class FunctionalTest(StaticLiveServerTestCase):
-    options = Options()
-    options.add_argument('--headless')
-
     def setUp(self) -> None:
-        self.browser = Firefox(options=self.options)
+        self.browser = self.firefox
         self.test_server = os.environ.get('TEST_SERVER')
         if self.test_server:
             self.live_server_url = f'http://{self.test_server}'
@@ -54,6 +53,19 @@ class FunctionalTest(StaticLiveServerTestCase):
             self.dump_html()
         self.browser.quit()
         super().tearDown()
+
+    def create_pre_authenticated_session(self, email: str):
+        if self.test_server:
+            session_key = create_session_on_server(self.test_server, email)
+        else:
+            session_key = create_pre_authenticated_session(email)
+
+        self.browser.get(self.live_server_url + '/404_no_such_url/')
+        self.browser.add_cookie({
+            'name': settings.SESSION_COOKIE_NAME,
+            'value': session_key,
+            'path': '/',
+        })
 
     def _test_has_failed(self):
         return self._outcome.result.failures or self._outcome.result.errors
@@ -69,7 +81,7 @@ class FunctionalTest(StaticLiveServerTestCase):
         path.write_text(self.browser.page_source)
 
     def _get_filename(self, extension: str):
-        timestamp = datetime.now().isoformat().replace(':', '.')[:19]
+        timestamp = datetime.now(UTC).isoformat().replace(':', '.')[:19]
         return f'{self.__class__.__name__}.{self._testMethodName}-{timestamp}.{extension}'
 
     def get_item_input_box(self):
@@ -111,3 +123,9 @@ class FunctionalTest(StaticLiveServerTestCase):
         self.get_item_input_box().send_keys(item_text, Keys.ENTER)
         item_number = num_rows + 1
         self.wait_for_row_in_list_table(f'{item_number}: {item_text}')
+
+    @property
+    def firefox(self) -> Firefox:
+        options = Options()
+        options.add_argument('--headless')
+        return Firefox(options=options)

@@ -1,6 +1,7 @@
 from django.db import IntegrityError
 from django.forms import ValidationError
 from django.test import TestCase
+
 from accounts.models import User
 from lists.models import Item, List
 

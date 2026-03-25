@@ -1,6 +1,7 @@
-from django.utils import html
 import lxml.html
 from django.test import TestCase
+from django.utils import html
+
 from accounts.models import User
 from lists.forms import DUPLICATE_ITEM_ERROR, EMPTY_ITEM_ERROR
 from lists.models import Item, List

@@ -1,6 +1,5 @@
 import subprocess
 
-
 USER = 'gleb'
 
 

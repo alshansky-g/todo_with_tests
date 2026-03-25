@@ -40,7 +40,7 @@ class NewVisitorTest(FunctionalTest):
         self.assertRegex(edith_list_url, '/lists/.+')
 
         self.browser.quit()
-        self.browser = Firefox(options=self.options)
+        self.browser = self.firefox
 
         self.browser.get(self.live_server_url)
         page_text = self.browser.find_element(By.TAG_NAME, 'body').text
