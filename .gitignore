@@ -16,3 +16,4 @@ src/static
 container.db.sqlite3
 /.vscode
 screendumps/
+node_modules/

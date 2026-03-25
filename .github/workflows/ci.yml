@@ -31,3 +31,21 @@ jobs:
         with:
           name: screendumps
           path: src/functional_tests/screendumps/
+
+  test-js:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - uses: browser-actions/setup-firefox@v1
+
+      - name: Install JS dependencies
+        run: cd src/lists/static && npm install
+
+      - name: Run JS tests
+        run: cd src/lists/static && npx jasmine-browser-runner runSpecs --config=tests/jasmine-browser-runner.config.mjs
